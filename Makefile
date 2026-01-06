@@ -1,15 +1,12 @@
-
-### `Makefile`
-```make
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -Iinclude
 
 SRC = \
-    src/core/main.c \
-    src/io/csv_reader.c \
-    src/io/csv_writer.c \
-    src/preprocessing/preprocess.c \
-    src/utils/string_utils.c
+	src/core/main.c \
+	src/io/csv_reader.c \
+	src/io/csv_writer.c \
+	src/preprocessing/preprocess.c \
+	src/utils/string_utils.c
 
 OBJ = $(SRC:.c=.o)
 TARGET = mt_pipeline
