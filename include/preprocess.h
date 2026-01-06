@@ -3,6 +3,6 @@
 
 #include "mt_pipeline.h"
 
-int preprocess_pipeline(PipelineData *data);
+int PreprocessPipeline(PipelineData *data);
 
 #endif

@@ -3,6 +3,6 @@
 
 #include "mt_pipeline.h"
 
-int csv_write_results(const char *filepath, const PipelineData *data);
+int CsvWriteResults(const char *filePath, const PipelineData *data);
 
 #endif

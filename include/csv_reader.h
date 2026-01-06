@@ -3,7 +3,7 @@
 
 #include "mt_pipeline.h"
 
-PipelineData *csv_read(const char *filepath);
-void pipeline_data_free(PipelineData *data);
+PipelineData *CsvRead(const char *filePath);
+void PipelineDataFree(PipelineData *data);
 
 #endif
