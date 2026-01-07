@@ -7,6 +7,8 @@ int PreprocessPipeline(PipelineData *data) {
 
     printf("[%s] Preprocessing %d data rows...\n", __func__, data->numRows);
 
+    // Parallelize the loop using OpenMP
+    #pragma omp parallel for
     for (int i = 0; i < data->numRows; i++) {
         MTEntry *e = data->entries[i];
         

@@ -30,7 +30,12 @@
 
 # Executables
 *.exe
+mt_pipeline
 *.out
+
+# Data Output
+data/output/*
+!.gitignore
 *.app
 *.i*86
 *.x86_64
