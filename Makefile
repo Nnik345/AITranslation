@@ -6,7 +6,9 @@ SRC = \
     src/io/csv_reader.c \
     src/io/csv_writer.c \
     src/preprocessing/preprocess.c \
-    src/utils/string_utils.c
+    src/utils/string_utils.c \
+    src/utils/score_utils.c \
+    src/scoring/bleu.c
 
 OBJ = $(SRC:.c=.o)
 TARGET = mt_pipeline
