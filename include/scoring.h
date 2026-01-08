@@ -54,13 +54,13 @@ void FreeTextTokens(TextTokens *tokens);
 double ComputeBleu(const char *candidate, const char *reference);
 
 /**
- * @brief Compute scores for all entries in pipeline data
+ * @brief Compute BLEU scores for all entries in pipeline data
  * 
  * Processes all MT systems in parallel using OpenMP.
- * Currently computes BLEU scores; METEOR and COMET are placeholders.
+ * Populates the bleuScores arrays in each MTEntry.
  * 
  * @param data Pipeline data containing all entries
  */
-void ComputeScores(PipelineData *data);
+void ComputeBleuScores(PipelineData *data);
 
 #endif

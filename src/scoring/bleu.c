@@ -181,11 +181,11 @@ double ComputeBleu(const char *candidate, const char *reference) {
  * 
  * This function processes all MT systems for all rows in parallel using OpenMP.
  * Each MT output is compared against its reference translation to compute
- * a BLEU score.
+ * a BLEU score. METEOR and COMET scores are set to 0.0 (placeholders).
  * 
  * @param data Pipeline data containing all entries and MT systems
  */
-void ComputeScores(PipelineData *data) {
+void ComputeBleuScores(PipelineData *data) {
     if (!data) return;
     
     printf("[%s] Computing BLEU scores for %d rows in parallel...\n", __func__, data->numRows);

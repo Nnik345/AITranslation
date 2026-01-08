@@ -42,9 +42,9 @@ void AppRun(const char *inputFile, const char *outputFile) {
     printf("Preprocessing complete.\n");
 
     // Step 3: Compute evaluation scores
-    ComputeScores(data);
-    // Future: ComputeMeteor(data);
-    // Future: ComputeComet(data);
+    ComputeBleuScores(data);
+    // Future: ComputeMeteorScores(data);
+    // Future: ComputeCometScores(data);
 
     // Step 4: Write results to CSV
     if (CsvWriteResults(outputFile, data) != MT_SUCCESS) {
