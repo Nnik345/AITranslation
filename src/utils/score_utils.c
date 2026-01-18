@@ -1,10 +1,9 @@
 /**
  * @file score_utils.c
- * @brief Text tokenization utilities for scoring metrics
+ * @brief Specialized tokenization for machine translation evaluation metrics.
  * 
- * Provides UTF-8 safe tokenization for Indian languages and other
- * multi-byte character sets. Handles ASCII punctuation separation
- * for proper BLEU score calculation.
+ * Implements a UTF-8 aware tokenizer that separates punctuation for fair
+ * metric calculation (especially for BLEU).
  */
 
 #include <stdio.h>
@@ -15,34 +14,27 @@
 #include "string_utils.h"
 
 /**
- * @brief Tokenize text into words and punctuation marks
+ * @brief Tokenizes input text into a list of words and punctuation marks.
  * 
- * This tokenizer is UTF-8 aware and handles:
- * - Multi-byte characters (Indian languages, etc.)
- * - ASCII punctuation as separate tokens
- * - Whitespace as delimiters
+ * Tokenization rules:
+ * 1. Sequences of ASCII whitespace are ignored.
+ * 2. Every ASCII punctuation character is treated as a separate token.
+ * 3. Multi-byte UTF-8 sequences (Indian scripts) are treated as part of words.
  * 
- * Example: "Hello, world" -> ["Hello", ",", "world"]
- * 
- * The tokenization follows standard BLEU tokenization where punctuation
- * is separated from words to ensure fair matching.
- * 
- * @param text Input text to tokenize (UTF-8 encoded)
- * @return TextTokens structure containing array of tokens, or NULL on error
+ * @param text UTF-8 encoded source string.
+ * @return TextTokens* Structure with the resulting token list.
  */
 TextTokens *TokenizeText(const char *text) {
     if (!text) return NULL;
 
-    // Allocate token structure
-    TextTokens *tt = malloc(sizeof(TextTokens));
+    TextTokens *tt = (TextTokens*)malloc(sizeof(TextTokens));
     if (!tt) return NULL;
     
     tt->tokens = NULL; 
     tt->count = 0;
-    int capacity = 16;
+    int capacity = 32;
     
-    // Allocate initial token array
-    tt->tokens = malloc(sizeof(char*) * capacity);
+    tt->tokens = (char**)malloc(sizeof(char*) * capacity);
     if (!tt->tokens) {
         free(tt);
         return NULL;
@@ -51,70 +43,58 @@ TextTokens *TokenizeText(const char *text) {
     const char *p = text;
     
     while (*p) {
-        // 1. Skip ASCII whitespace
+        // Skip whitespace
         if ((unsigned char)*p <= 127 && isspace((unsigned char)*p)) {
             p++;
             continue;
         }
 
-        // 2. Handle ASCII punctuation as separate tokens
-        // This ensures "Hello," becomes ["Hello", ","] for proper matching
+        // Punctuation handling (ASCII)
         if ((unsigned char)*p <= 127 && ispunct((unsigned char)*p)) {
-            char *token = malloc(2);
-            token[0] = *p;
-            token[1] = '\0';
-            
-            // Resize array if needed
-            if (tt->count >= capacity) {
-                capacity *= 2;
-                char **newTokens = realloc(tt->tokens, sizeof(char*) * capacity);
-                if (!newTokens) {
-                    free(token);
-                    break;
+            char *token = (char*)malloc(2);
+            if (token) {
+                token[0] = *p;
+                token[1] = '\0';
+                
+                if (tt->count >= capacity) {
+                    capacity *= 2;
+                    char **newTokens = (char**)realloc(tt->tokens, sizeof(char*) * capacity);
+                    if (!newTokens) { free(token); break; }
+                    tt->tokens = newTokens;
                 }
-                tt->tokens = newTokens;
+                tt->tokens[tt->count++] = token;
             }
-            
-            tt->tokens[tt->count++] = token;
             p++;
             continue;
         }
 
-        // 3. Handle word (alphanumeric or multi-byte UTF-8 sequence)
-        // Consume all characters until we hit whitespace or punctuation
+        // Word / Multi-byte sequence handling
         const char *start = p;
         while (*p) {
             unsigned char c = (unsigned char)*p;
-            
-            // Stop at ASCII whitespace or punctuation
+            // Stop at delimiters
             if (c <= 127 && (isspace(c) || ispunct(c))) {
                 break;
             }
-            
-            // Multi-byte UTF-8 characters (>= 0x80) are part of the word
-            // Indian language characters fall into this category
-            p++;
+            p++; // Keep moving (including over UTF-8 high-bit chars)
         }
 
-        // Extract the word token
         int len = p - start;
         if (len > 0) {
-            char *token = malloc(len + 1);
-            strncpy(token, start, len);
-            token[len] = '\0';
+            char *token = (char*)malloc(len + 1);
+            if (token) {
+                memcpy(token, start, len);
+                token[len] = '\0';
 
-            // Resize array if needed
-            if (tt->count >= capacity) {
-                capacity *= 2;
-                char **newTokens = realloc(tt->tokens, sizeof(char*) * capacity);
-                if (!newTokens) {
-                    free(token);
-                    break;
+                if (tt->count >= capacity) {
+                    capacity *= 2;
+                    char **newTokens = (char**)realloc(tt->tokens, sizeof(char*) * capacity);
+                    if (!newTokens) { free(token); break; }
+                    tt->tokens = newTokens;
                 }
-                tt->tokens = newTokens;
+                
+                tt->tokens[tt->count++] = token;
             }
-            
-            tt->tokens[tt->count++] = token;
         }
     }
 
@@ -122,25 +102,16 @@ TextTokens *TokenizeText(const char *text) {
 }
 
 /**
- * @brief Free memory allocated for TextTokens structure
- * 
- * Safely deallocates all tokens and the structure itself.
- * Handles NULL pointers gracefully.
- * 
- * @param tokens TextTokens structure to free
+ * @brief Deallocates all memory associated with a TextTokens structure.
  */
 void FreeTextTokens(TextTokens *tokens) {
     if (!tokens) return;
     
     if (tokens->tokens) {
-        // Free each individual token string
         for (int i = 0; i < tokens->count; i++) {
-            free(tokens->tokens[i]);
+            if (tokens->tokens[i]) free(tokens->tokens[i]);
         }
-        // Free the token array
         free(tokens->tokens);
     }
-    
-    // Free the structure itself
     free(tokens);
 }

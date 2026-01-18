@@ -63,4 +63,17 @@ double ComputeBleu(const char *candidate, const char *reference);
  */
 void ComputeBleuScores(PipelineData *data);
 
+/* Scoring Functions (src/scoring/meteor_wrapper.c) */
+
+/**
+ * @brief Compute METEOR scores for all entries in pipeline data
+ * 
+ * Processes all MT systems in parallel using OpenMP.
+ * Populates the meteorScores arrays in each MTEntry.
+ * Uses Snowball stemmers and IndoWordNet synonyms.
+ * 
+ * @param data Pipeline data containing all entries
+ */
+void ComputeMeteorScores(PipelineData *data);
+
 #endif

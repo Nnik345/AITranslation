@@ -1,41 +1,42 @@
 /**
  * @file preprocess.c
- * @brief Text preprocessing implementation
- * 
- * Provides text normalization (whitespace trimming) for all text fields
- * in the MT evaluation pipeline. Uses OpenMP for parallel processing.
+ * @brief Implementation of text normalization and preprocessing.
  */
 
 #include <stdio.h>
+#include <omp.h>
 #include "preprocess.h"
 #include "string_utils.h"
 
 /**
- * @brief Preprocess all text in pipeline data
+ * @brief Normalizes all text fields within the PipelineData structure.
  * 
- * Trims whitespace from source, reference, and all MT outputs.
- * Processes rows in parallel using OpenMP for efficiency.
+ * This currently performs whitespace trimming on:
+ * - Source text
+ * - Reference translation
+ * - All machine translation outputs
  * 
- * @param data Pipeline data to preprocess
- * @return MT_SUCCESS on success, MT_ERROR_INVALID_FORMAT if data is NULL
+ * @param data Data structure to process in-place.
+ * @return int MT_SUCCESS on completion, or error code.
  */
 int PreprocessPipeline(PipelineData *data) {
     if (!data) return MT_ERROR_INVALID_FORMAT;
 
-    printf("[%s] Preprocessing %d data rows...\n", __func__, data->numRows);
-
-    // Parallelize across rows using OpenMP
+    // Parallelize processing across entries for speed improvement on large datasets.
     #pragma omp parallel for
     for (int i = 0; i < data->numRows; i++) {
         MTEntry *e = data->entries[i];
+        if (!e) continue;
         
-        // Trim source and reference text
-        StrTrim(e->source);
-        StrTrim(e->reference);
+        // Trim source and reference
+        if (e->source) StrTrim(e->source);
+        if (e->reference) StrTrim(e->reference);
         
-        // Trim all MT system outputs
-        for (int j = 0; j < data->numMtSystems; j++) {
-            StrTrim(e->mtOutputs[j]);
+        // Trim all MT outputs
+        if (e->mtOutputs) {
+            for (int j = 0; j < data->numMtSystems; j++) {
+                if (e->mtOutputs[j]) StrTrim(e->mtOutputs[j]);
+            }
         }
     }
 

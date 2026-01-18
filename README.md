@@ -1,39 +1,45 @@
 # Machine Translation Evaluation Pipeline
 
-A C-based pipeline for evaluating Machine Translation (MT) systems using metrics like BLEU, METEOR, and COMET. This project supports evaluating multiple MT systems against a reference translation, with specific support for Indian languages (UTF-8).
+A high-performance C-based pipeline for evaluating Machine Translation (MT) systems using industry-standard metrics like BLEU and METEOR. This project is optimized for speed using OpenMP and supports multi-byte UTF-8 character sets for Indian languages.
 
 ## Features
 
-### Phase 1: Infrastructure ✅
--   **Robust CSV I/O**: Reads/writes CSV files with RFC 4180 compliance, handling dynamic numbers of MT systems and quoted fields.
--   **Multilingual Support**: Fully supports UTF-8 for Indian languages (Hindi, Tamil, Telugu, Kannada, Bengali, etc.).
--   **Parallel Preprocessing**: Uses OpenMP to parallelize text normalization across data rows.
--   **Extensible Structure**: Modular design with separate Core, I/O, Preprocessing, Scoring, and Utils components.
+### Core Infrastructure
+-   **Robust CSV I/O**: RFC 4180 compliant reader/writer handling dynamic numbers of MT systems and complex quoted fields.
+-   **Multilingual Support**: First-class support for Hindi and Tamil (UTF-8).
+-   **Parallel Processing**: OpenMP-based parallelization for preprocessing and metric computation.
+-   **Modular Design**: Clean separation between core logic, I/O, preprocessing, scoring, and utilities.
 
-### Phase 2: BLEU Metric ✅
--   **BLEU Score Calculation**: Implements the standard BLEU metric (Papineni et al., 2002)
-    -   Modified N-gram precision (1-gram through 4-gram)
-    -   Brevity penalty for short translations
-    -   UTF-8 aware tokenization with punctuation separation
--   **Parallel Scoring**: Computes scores in parallel using OpenMP for efficient processing
+### Supported Metrics
+-   **BLEU Score**:
+    -   Modified N-gram precision (1-gram to 4-gram).
+    -   Brevity penalty.
+    -   Standard punctuation-aware tokenization.
+-   **METEOR Score**:
+    -   Multi-pass greedy alignment (Exact, Stem, Synonym).
+    -   Integrated Snowball stemmers for Hindi and Tamil.
+    -   Synonym support via IndoWordNet integration.
 
-## Building the Project
+## Getting Started
 
 ### Prerequisites
--   GCC (C11 support) with OpenMP support (`libgomp`)
--   Make
+-   **Compiler**: GCC/G++ with OpenMP support.
+-   **Library**: `libgomp` (usually bundled with GCC).
+-   **System**: Linux or Windows (MinGW/MSYS2).
 
-### Build Command
-Run `make` in the root directory:
-```bash
-make
-```
-This generates the `mt_pipeline` executable.
+### Data Preparation
+To use the METEOR metric with synonym support, you must have the synset files in `data/indowordnet/`:
+- `hi_synsets.txt`
+- `ta_synsets.txt`
 
-To clean build artifacts:
+These can be generated using the provided `import_indowordnet.py` script (requires `pyiwn`).
+
+### Building
+Run `make` to compile the project:
 ```bash
-make clean
+make clean && make
 ```
+This produces the `mt_pipeline` executable.
 
 ## Usage
 
@@ -41,75 +47,33 @@ make clean
 ./mt_pipeline <input_csv> <output_csv>
 ```
 
-### Input Format
-The input CSV should have the following header structure:
-```csv
-Source,MT1,MT2,...,MTn,Reference
-```
--   **Source**: The original source sentence
--   **MT1...MTn**: Output from various translation systems (e.g., ChatGPT, Google Translate, Bashaverse)
--   **Reference**: The human reference translation
+### Input CSV Structure
+Header format: `Source,MT1,MT2,...,MTn,Reference`
 
-Example (`data/input/sample.csv`):
-```csv
-Source,ChatGPT,Google Translate,Bashaverse,Reference
-"Hello, how are you?","नमस्ते, आप कैसे हैं?","हेलो, आप कैसे हैं?","नमस्ते, क्या हाल है?","नमस्ते, आप कैसे हैं?"
-```
-
-### Output Format
-The output CSV contains the original data plus score columns for each MT system:
-```csv
-Source,MT1,MT1_Bleu,MT1_Meteor,MT1_Comet,MT2,MT2_Bleu,MT2_Meteor,MT2_Comet,...,Reference
-```
-
-Currently, only BLEU scores are computed. METEOR and COMET scores are placeholders (0.0000).
+### Output CSV Structure
+Expanded format: `Source,MT1,MT1_Bleu,MT1_Meteor,MT1_Comet,...,Reference`
 
 ## Project Structure
 ```
 Machine-Translation-Evaluation/
 ├── src/
-│   ├── core/           # Main application logic
-│   ├── io/             # CSV Reader and Writer
-│   ├── preprocessing/  # Text normalization
-│   ├── scoring/        # BLEU implementation
-│   └── utils/          # String and tokenization utilities
-├── include/            # Header files
+│   ├── core/           # Main application entry
+│   ├── io/             # CSV I/O implementation
+│   ├── preprocessing/  # Text normalization and Stemmer wrappers
+│   ├── scoring/        # BLEU and C++ METEOR engine
+│   └── utils/          # String and scoring helper utilities
+├── include/            # C/C++ Header files
 ├── data/
-│   ├── input/          # Sample input data
-│   └── output/         # Generated results
+│   ├── indowordnet/    # Synonym data for METEOR
+│   ├── input/          # Test data (e.g., sample.csv)
+│   └── output/         # Result storage
 ├── Makefile
 └── README.md
 ```
 
-## Implementation Details
-
-### BLEU Score
-The BLEU (Bilingual Evaluation Understudy) metric measures translation quality by:
-1.  **N-gram Precision**: Counting how many word sequences (1-4 words) in the candidate match the reference
-2.  **Modified Precision**: Clipping counts to prevent gaming the system
-3.  **Brevity Penalty**: Penalizing translations that are too short
-
-Formula: `BLEU = BP × exp(Σ(w_n × log(p_n)))`
-
-### Tokenization
-The tokenizer is UTF-8 aware and:
--   Treats multi-byte characters (Indian scripts) as word components
--   Separates ASCII punctuation into individual tokens
--   Uses whitespace as primary delimiter
-
-Example: `"Hello, world"` → `["Hello", ",", "world"]`
-
-### Parallelization
-Both preprocessing and scoring use OpenMP to process rows in parallel, utilizing all available CPU cores for faster execution.
-
-## Future Plans
--   Implementation of METEOR metric
--   Implementation of COMET metric
--   Corpus-level BLEU calculation
--   Additional preprocessing options (lowercasing, normalization)
-
 ## References
--   Papineni, K., Roukos, S., Ward, T., & Zhu, W. J. (2002). BLEU: a method for automatic evaluation of machine translation. *Proceedings of ACL*.
+-   Papineni, K., et al. (2002). "BLEU: a method for automatic evaluation of machine translation."
+-   Banerjee, S., & Lavie, A. (2005). "METEOR: An automatic metric for MT evaluation with improved correlation with human judgments."
 
 ## License
-This project is for research and educational purposes.
+Research and Educational purposes.
