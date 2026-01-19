@@ -19,6 +19,7 @@ typedef struct {
     char *source;        ///< Original source text
     char **mtOutputs;    ///< Array of MT outputs [0..numMtSystems-1]
     char *reference;     ///< Human reference translation
+    char lang[16];       ///< Detected language code (e.g., "hi", "ta")
 
     // Evaluation scores (parallel arrays, one per MT system)
     double *bleuScores;   ///< BLEU scores array

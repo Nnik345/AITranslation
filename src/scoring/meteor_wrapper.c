@@ -29,14 +29,10 @@ void ComputeMeteorScores(PipelineData *data) {
         if (!e) continue;
         
         for (int j = 0; j < data->numMtSystems; j++) {
-            // Heuristic Language Detection:
-            // "க்" is a very common Tamil character (ka + pulli).
-            // This is a simplified check for this specific research context.
-            const char* lang = "hi"; 
-            if (e->reference && strstr(e->reference, "க்")) {
-                lang = "ta";
-            }
-
+            // Use detected language from DetectLanguages() step
+            // Default to "hi" if empty or too short, otherwise use the code (e.g., "ta", "hi")
+            const char* lang = (strlen(e->lang) > 0) ? e->lang : "hi";
+            
             e->meteorScores[j] = ComputeMeteorScore(e->mtOutputs[j], e->reference, lang);
         }
     }

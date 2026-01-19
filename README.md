@@ -56,9 +56,28 @@ This produces the `mt_pipeline` executable.
 
 ## Usage
 
+### Command Line
+
 ```bash
 ./mt_pipeline <input_csv> <output_csv>
 ```
+
+### Jupyter Notebook (Interactive)
+
+For an interactive evaluation experience:
+
+```bash
+jupyter notebook evaluate_mt.ipynb
+```
+
+The notebook provides:
+- Input file selection and preview
+- Real-time pipeline execution
+- Results visualization
+- Score summary statistics
+- Optional detailed analysis
+
+---
 
 ### Input CSV Structure
 Header format: `Source,MT1,MT2,...,MTn,Reference`
