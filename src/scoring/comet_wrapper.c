@@ -11,7 +11,7 @@
 
 #define COMET_INPUT_FILE "temp_comet_input.json"
 #define COMET_OUTPUT_FILE "temp_comet_output.json"
-#define COMET_SCRIPT "compute_comet.py"
+#define COMET_SCRIPT "scripts/compute_comet.py"
 
 /**
  * @brief Writes pipeline data to JSON format for COMET script.

@@ -69,11 +69,16 @@ Expanded format: `Source,MT1,MT1_Bleu,MT1_Meteor,MT1_Comet,...,Reference`
 ## Project Structure
 ```
 Machine-Translation-Evaluation/
+├── scripts/            # Python utility scripts
+│   ├── compute_comet.py       # COMET scoring subprocess
+│   └── import_indowordnet.py  # IndoWordNet data import
+├── tests/              # Test programs
+│   └── test_stemmer.c         # Stemmer validation tests
 ├── src/
 │   ├── core/           # Main application entry
 │   ├── io/             # CSV I/O implementation
 │   ├── preprocessing/  # Text normalization and Stemmer wrappers
-│   ├── scoring/        # BLEU and C++ METEOR engine
+│   ├── scoring/        # BLEU, METEOR, and COMET implementations
 │   └── utils/          # String and scoring helper utilities
 ├── include/            # C/C++ Header files
 ├── data/
@@ -81,7 +86,8 @@ Machine-Translation-Evaluation/
 │   ├── input/          # Test data (e.g., sample.csv)
 │   └── output/         # Result storage
 ├── Makefile
-└── README.md
+├── README.md
+└── requirements.txt
 ```
 
 ## References
