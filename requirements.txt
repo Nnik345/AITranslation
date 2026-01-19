@@ -1,0 +1,9 @@
+# Machine Translation Evaluation Pipeline - Requirements
+
+# Core COMET dependencies
+unbabel-comet>=2.0.0
+torch>=2.0.0
+transformers>=4.30.0
+
+# IndoWordNet data import
+pyiwn>=0.0.5

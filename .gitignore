@@ -58,3 +58,17 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Python virtual environment
+venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# COMET temp files
+temp_comet_input.json
+temp_comet_output.json

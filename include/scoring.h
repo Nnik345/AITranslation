@@ -76,4 +76,15 @@ void ComputeBleuScores(PipelineData *data);
  */
 void ComputeMeteorScores(PipelineData *data);
 
+/**
+ * @brief Compute COMET scores for all MT systems
+ * 
+ * Invokes Python subprocess to compute neural COMET scores.
+ * Requires Python with unbabel-comet installed.
+ * Populates the cometScores arrays in each MTEntry.
+ * 
+ * @param data Pipeline data containing all entries
+ */
+void ComputeCometScores(PipelineData *data);
+
 #endif

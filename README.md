@@ -19,6 +19,10 @@ A high-performance C-based pipeline for evaluating Machine Translation (MT) syst
     -   Multi-pass greedy alignment (Exact, Stem, Synonym).
     -   Integrated Snowball stemmers for Hindi and Tamil.
     -   Synonym support via IndoWordNet integration.
+-   **COMET Score**:
+    -   Neural metric using Unbabel's `wmt22-comet-da` model.
+    -   Requires source, MT output, and reference.
+    -   GPU acceleration when available, CPU fallback.
 
 ## Getting Started
 
@@ -26,6 +30,15 @@ A high-performance C-based pipeline for evaluating Machine Translation (MT) syst
 -   **Compiler**: GCC/G++ with OpenMP support.
 -   **Library**: `libgomp` (usually bundled with GCC).
 -   **System**: Linux or Windows (MinGW/MSYS2).
+-   **Python**: Python 3.8+ with pip (for COMET metric).
+
+### Python Setup (for COMET)
+Install Python dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+**Note**: First run will download the COMET model (~2GB). Requires internet connection.
 
 ### Data Preparation
 To use the METEOR metric with synonym support, you must have the synset files in `data/indowordnet/`:

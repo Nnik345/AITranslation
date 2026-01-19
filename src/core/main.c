@@ -50,6 +50,7 @@ void AppRun(const char *inputFile, const char *outputFile) {
     // Each of these functions is parallelized via OpenMP where profitable.
     ComputeBleuScores(data);
     ComputeMeteorScores(data);
+    ComputeCometScores(data);
 
     // Step 4: Write results
     if (CsvWriteResults(outputFile, data) != MT_SUCCESS) {
