@@ -35,6 +35,7 @@ typedef struct {
 typedef struct {
     int numRows;         ///< Number of translation entries
     int numMtSystems;    ///< Number of MT systems being evaluated
+    char **mtSystemNames; ///< Original names of MT systems (e.g., "BashaVerse")
     MTEntry **entries;   ///< Array of pointers to MTEntry structures
 } PipelineData;
 

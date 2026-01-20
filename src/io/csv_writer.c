@@ -55,10 +55,18 @@ int CsvWriteResults(const char *filePath, const PipelineData *data) {
     }
 
     // 1. Write Header
-    // Consistent structure: Source, [MT_j, MT_j_Metric1, ...], Reference
+    // Consistent structure: Source, [SystemName, SystemName_Bleu, ...], Reference
     fprintf(f, "Source");
     for (int i = 0; i < data->numMtSystems; i++) {
-        fprintf(f, ",MT%d,MT%d_Bleu,MT%d_Meteor,MT%d_Comet", i+1, i+1, i+1, i+1);
+        const char *sysName = data->mtSystemNames ? data->mtSystemNames[i] : "MT";
+        
+        fprintf(f, ",");
+        WriteField(f, sysName, 0); // System Output Column
+        
+        // Write Score Headers using original name
+        fprintf(f, ",%s_Bleu", sysName);
+        fprintf(f, ",%s_Meteor", sysName);
+        fprintf(f, ",%s_Comet", sysName);
     }
     fprintf(f, ",Reference\n");
 

@@ -58,6 +58,12 @@ PipelineData *CsvRead(const char *filePath) {
     data->numMtSystems = numMt;
     data->numRows = 0;
     
+    // Store original system names
+    data->mtSystemNames = malloc(sizeof(char*) * numMt);
+    for (int i = 0; i < numMt; i++) {
+        data->mtSystemNames[i] = StrDup(headerTokens[i + 1]); // Skip 'Source' (index 0)
+    }
+
     int rowCap = 128; // Initial row capacity
     data->entries = malloc(sizeof(MTEntry*) * rowCap);
     
